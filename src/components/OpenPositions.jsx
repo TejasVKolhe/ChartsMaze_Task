@@ -1,6 +1,6 @@
 // src/components/OpenPositions.jsx
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Search, Filter, ArrowUp, ArrowDown } from 'lucide-react';
 
 const OpenPositions = () => {
   // State for search and filters
@@ -71,280 +71,289 @@ const OpenPositions = () => {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
+  // Sort indicator component
+  const SortIndicator = ({ field }) => {
+    if (sortField !== field) {
+      return <span className="text-gray-400">•</span>;
+    }
+    return sortDirection === 'asc' ? 
+      <ArrowUp size={16} className="text-gray-700" /> : 
+      <ArrowDown size={16} className="text-gray-700" />;
+  };
+
   return (
-    <div className="container mx-auto py-8">
-      {/* Header with title and add button */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Open Positions</h1>
+    <div className="container mx-auto py-8 px-4">
+      {/* Header with improved spacing and alignment */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-gray-800">Open Positions</h2>
           <button
-            className="p-1 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors"
-            aria-label="add trade"
+            className="p-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-colors shadow-sm"
+            aria-label="Add new trade"
             onClick={openModal}
           >
-            <Plus size={20} />
+            <Plus size={18} />
           </button>
         </div>
 
-        <div className="flex gap-4 items-center justify-center">
-          <div>
-            <div className="flex items-center gap-2">
-              <span>Load:</span>
-              <select 
-                className="h-10 rounded-full min-w-[100px] bg-white border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={selectedTradeBook}
-                onChange={(e) => setSelectedTradeBook(e.target.value)}
-              >
-                <option value="">--</option>
-                {/* Add options dynamically when available */}
-              </select>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+          <span className="text-gray-700 font-medium">Load:</span>
+          <select 
+            className="rounded-lg border border-gray-300 px-4 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm min-w-[180px]"
+            value={selectedTradeBook}
+            onChange={(e) => setSelectedTradeBook(e.target.value)}
+          >
+            <option value="">Select Trade Book</option>
+            {/* Add options dynamically when available */}
+          </select>
         </div>
       </div>
 
-      {/* Search and filters */}
-      <div className="flex flex-wrap items-center justify-between py-4 mb-4 border-b gap-4">
-        <div className="flex items-center gap-4">
-          <input
-            className="max-w-[200px] border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Search symbol..."
-            type="text"
-            value={searchSymbol}
-            onChange={(e) => setSearchSymbol(e.target.value)}
-          />
-
-          <div className="flex gap-2 items-center">
-            <label className="font-semibold whitespace-nowrap">Initial Total Capital:</label>
+      {/* Search and filters with improved layout */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200 shadow-sm">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="relative flex-grow max-w-xs">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search size={18} className="text-gray-500" />
+            </div>
             <input
-              className="focus:border-blue-500 focus:ring-2 focus:ring-blue-200 border border-slate-200 rounded-md px-3 py-2"
-              placeholder="Enter portfolio"
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 shadow-sm"
+              placeholder="Search symbol..."
+              type="text"
+              value={searchSymbol}
+              onChange={(e) => setSearchSymbol(e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <label className="font-medium text-gray-700 whitespace-nowrap">Initial Total Capital:</label>
+            <input
+              className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 shadow-sm w-36"
+              placeholder="Enter amount"
               type="number"
               value={initialCapital}
               onChange={(e) => setInitialCapital(e.target.value)}
-              style={{ width: '120px', borderRadius: '6px', borderWidth: '2px', borderColor: '#E2E8F0', padding: '8px 12px' }}
             />
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="space-y-4">
-        <div className="rounded-md border">
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('symbol')}>
-                    <div className="flex items-center gap-2">
-                      <span>
-                        <div className="text-center font-bold">
-                          <div>Symbol</div>
-                        </div>
-                      </span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
+      {/* Table with improved styling */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                {/* Symbol column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('symbol')}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Symbol</span>
+                    <SortIndicator field="symbol" />
+                  </div>
+                </th>
+                
+                {/* Position Size column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('positionSize')}
+                >
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div>Position Sizing</div>
+                      <div className="text-xs text-gray-500">%</div>
                     </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('positionSize')}>
-                    <div className="flex items-center gap-2">
-                      <span>
-                        <div className="text-center font-bold">
-                          <div>Position Sizing</div>
-                          <div>%</div>
-                        </div>
-                      </span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
+                    <SortIndicator field="positionSize" />
+                  </div>
+                </th>
+                
+                {/* Days Held column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('daysHeld')}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Days Held</span>
+                    <SortIndicator field="daysHeld" />
+                  </div>
+                </th>
+                
+                {/* SL column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('sl')}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>SL(%)</span>
+                    <SortIndicator field="sl" />
+                  </div>
+                </th>
+                
+                {/* Open Risk column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('openRisk')}
+                >
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div>Open Risk</div>
+                      <div className="text-xs text-gray-500">%</div>
                     </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('daysHeld')}>
-                    <div className="flex items-center gap-2">
-                      <span>Days Held</span>
-                      <span className="inline-flex">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="24" 
-                          height="24" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          className={`h-4 w-4 transition-transform ${sortField === 'daysHeld' && sortDirection === 'asc' ? 'text-blue-600 rotate-180' : 'text-gray-500'} ${sortField === 'daysHeld' && sortDirection === 'desc' ? 'text-blue-600' : ''}`}
-                          aria-hidden="true"
-                        >
-                          <path d="M12 5v14"></path>
-                          <path d="m19 12-7 7-7-7"></path>
-                        </svg>
-                      </span>
+                    <SortIndicator field="openRisk" />
+                  </div>
+                </th>
+                
+                {/* Unrealized P/L column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('unrealizedPL')}
+                >
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div>Unrealized P/L</div>
+                      <div className="text-xs text-gray-500">%(₹)</div>
                     </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('sl')}>
-                    <div className="flex items-center gap-2">
-                      <span>SL(%)</span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
+                    <SortIndicator field="unrealizedPL" />
+                  </div>
+                </th>
+                
+                {/* R Multiples column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('rMultiples')}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>R Multiples</span>
+                    <SortIndicator field="rMultiples" />
+                  </div>
+                </th>
+                
+                {/* Portfolio Gain column */}
+                <th 
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                  onClick={() => handleSort('portfolioGain')}
+                >
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div>Portfolio Gain</div>
+                      <div className="text-xs text-gray-500">%</div>
                     </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('openRisk')}>
-                    <div className="flex items-center gap-2">
-                      <span>
-                        <div className="text-center font-bold">
-                          <div>Open Risk</div>
-                          <div>%</div>
-                        </div>
-                      </span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
-                    </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('unrealizedPL')}>
-                    <div className="flex items-center gap-2">
-                      <span>
-                        <div className="text-center font-bold">
-                          <div>Unrealized P/L</div>
-                          <div>%(₹)</div>
-                        </div>
-                      </span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
-                    </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('rMultiples')}>
-                    <div className="flex items-center gap-2">
-                      <span>R Multiples Achieved</span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
-                    </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 cursor-pointer select-none hover:bg-gray-200" onClick={() => handleSort('portfolioGain')}>
-                    <div className="flex items-center gap-2">
-                      <span>
-                        <div className="text-center font-bold">
-                          <div>Unrealized Portfolio Gain</div>
-                          <div>%</div>
-                        </div>
-                      </span>
-                      <span className="inline-flex">
-                        <span className="h-4 w-4 text-gray-300 flex items-center justify-center">•</span>
-                      </span>
-                    </div>
-                  </th>
-                  
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <span></span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {positions.length > 0 ? (
-                  positions.map((position, index) => (
-                    <tr key={index} className="border-t hover:bg-gray-50">
-                      <td className="px-4 py-3">{position.symbol}</td>
-                      <td className="px-4 py-3">{position.positionSize}%</td>
-                      <td className="px-4 py-3">{position.daysHeld}</td>
-                      <td className="px-4 py-3">{position.sl}%</td>
-                      <td className="px-4 py-3">{position.openRisk}%</td>
-                      <td className="px-4 py-3">{position.unrealizedPL}%</td>
-                      <td className="px-4 py-3">{position.rMultiples}</td>
-                      <td className="px-4 py-3">{position.portfolioGain}%</td>
-                      <td className="px-4 py-3">
-                        <button className="text-blue-500 hover:text-blue-700">Edit</button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="9" className="h-24 text-center text-sm text-gray-500">No Data</td>
+                    <SortIndicator field="portfolioGain" />
+                  </div>
+                </th>
+                
+                {/* Actions column */}
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  <span>Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {positions.length > 0 ? (
+                positions.map((position, index) => (
+                  <tr key={index} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm text-gray-800 font-medium">{position.symbol}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.positionSize}%</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.daysHeld}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.sl}%</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.openRisk}%</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.unrealizedPL}%</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.rMultiples}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{position.portfolioGain}%</td>
+                    <td className="px-6 py-4 text-sm">
+                      <button className="font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                        Edit
+                      </button>
+                    </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="h-32 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <Filter size={24} className="text-gray-400 mb-2" />
+                      <p>No positions found</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
         
-        {/* Pagination */}
-        <div className="flex items-center justify-center py-4 px-2">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 1}
-            className={`flex items-center justify-center h-8 rounded-md text-xs px-2 ${
-              currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
-            }`}
-            aria-label="Previous page"
-            style={{ boxShadow: 'none' }}
-          >
-            <ChevronLeft className="h-5 w-5" style={{ color: 'rgb(15, 198, 146)' }} />
-          </button>
-          
-          <div className="text-center text-sm font-medium mx-2">
-            Showing <span className="font-bold">{totalItems > 0 ? startItem : 1}</span> - <span className="font-bold">{endItem}</span> of <span className="font-bold">{totalItems}</span>
+        {/* Improved pagination */}
+        <div className="flex items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50">
+          <div className="text-sm text-gray-700">
+            {totalItems > 0 ? (
+              <span>Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of <span className="font-medium">{totalItems}</span> positions</span>
+            ) : (
+              <span>No positions</span>
+            )}
           </div>
           
-          <button
-            onClick={nextPage}
-            disabled={endItem >= totalItems}
-            className={`flex items-center justify-center h-8 rounded-md text-xs px-2 ${
-              endItem >= totalItems ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
-            }`}
-            aria-label="Next page"
-            style={{ boxShadow: 'none' }}
-          >
-            <ChevronRight className="h-5 w-5" style={{ color: 'rgb(15, 198, 146)' }} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className={`flex items-center justify-center h-8 w-8 rounded-md ${
+                currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            
+            <span className="text-sm text-gray-700 font-medium">{currentPage}</span>
+            
+            <button
+              onClick={nextPage}
+              disabled={endItem >= totalItems}
+              className={`flex items-center justify-center h-8 w-8 rounded-md ${
+                endItem >= totalItems ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              aria-label="Next page"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Modal - Updated to match ManageTrades modal */}
+      {/* Improved modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Trade Book</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Create New Trade Book</h3>
             
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Enter a name for the new trade book:
+                  Trade Book Name
                 </label>
                 <input
                   type="text"
                   placeholder="Enter trade book name"
                   value={newTradeBookName}
                   onChange={(e) => setNewTradeBookName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Enter initial total capital (portfolio value + cash)
+                  Initial Total Capital
                 </label>
                 <input
                   type="number"
-                  placeholder="Initial Total Capital"
+                  placeholder="Enter amount"
                   value={initialCapital}
                   onChange={(e) => setInitialCapital(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Initial Total Capital will affect portfolio level P&L. If unknown, set 0.
+                  Initial Total Capital will affect portfolio level P&L calculations. Set to 0 if unknown.
                 </p>
               </div>
               
@@ -356,22 +365,22 @@ const OpenPositions = () => {
                   onChange={(e) => setIncludeOpenPositions(e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="openPositions" className="ml-2 block text-sm text-gray-700">
-                  Open Positions
+                <label htmlFor="openPositions" className="ml-2 text-sm text-gray-700">
+                  Include Open Positions
                 </label>
               </div>
             </div>
             
-            <div className="mt-6 flex justify-end space-x-3">
+            <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 Save
               </button>

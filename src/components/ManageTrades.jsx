@@ -1,16 +1,189 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Plus, Calendar, ChevronDown } from 'lucide-react';
 
 const ManageTrades = () => {
   const [searchSymbol, setSearchSymbol] = useState('');
   const [slPercentage, setSlPercentage] = useState(5);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [isStartDateFocused, setIsStartDateFocused] = useState(false);
-  const [isEndDateFocused, setIsEndDateFocused] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTradeBookName, setNewTradeBookName] = useState('');
   const [initialCapital, setInitialCapital] = useState('');
   const [includeOpenPositions, setIncludeOpenPositions] = useState(false);
+  const [tradeBooks, setTradeBooks] = useState(['Personal Portfolio', 'Swing Trading', 'Day Trading']);
+  const [activeTradeBook, setActiveTradeBook] = useState('');
+
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check window size on mount and resize
+  useEffect(() => {
+    const checkSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  
+  // Calendar state
+  const today = new Date();
+  const [startMonth, setStartMonth] = useState(today.getMonth());
+  const [startYear, setStartYear] = useState(today.getFullYear());
+  const [endMonth, setEndMonth] = useState(today.getMonth());
+  const [endYear, setEndYear] = useState(today.getFullYear());
+  
+  // Format date as YYYY-MM-DD
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+  
+  // Generate days for calendar
+  const generateCalendarDays = (year, month) => {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    
+    // Get day of week for first day (0 = Sunday, 6 = Saturday)
+    const firstDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Add empty cells for days before first day of month
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      days.push({ day: null, isCurrentMonth: false });
+    }
+    
+    // Add all days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push({ day, isCurrentMonth: true });
+    }
+    
+    return days;
+  };
+  
+  // Move calendar month
+  const changeMonth = (side, direction) => {
+    if (side === 'start') {
+      if (direction === 'prev') {
+        if (startMonth === 0) {
+          setStartMonth(11);
+          setStartYear(startYear - 1);
+        } else {
+          setStartMonth(startMonth - 1);
+        }
+      } else {
+        if (startMonth === 11) {
+          setStartMonth(0);
+          setStartYear(startYear + 1);
+        } else {
+          setStartMonth(startMonth + 1);
+        }
+      }
+    } else {
+      if (direction === 'prev') {
+        if (endMonth === 0) {
+          setEndMonth(11);
+          setEndYear(endYear - 1);
+        } else {
+          setEndMonth(endMonth - 1);
+        }
+      } else {
+        if (endMonth === 11) {
+          setEndMonth(0);
+          setEndYear(endYear + 1);
+        } else {
+          setEndMonth(endMonth + 1);
+        }
+      }
+    }
+  };
+  
+  // Get month name
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  
+  // Handle date selection
+  const handleDateSelect = (side, day) => {
+    const date = new Date(side === 'start' ? startYear : endYear, side === 'start' ? startMonth : endMonth, day);
+    if (side === 'start') {
+      setStartDate(formatDate(date));
+    } else {
+      setEndDate(formatDate(date));
+    }
+  };
+  
+  // Preset date ranges
+  const setDateRange = (range) => {
+    const today = new Date();
+    let start, end;
+    
+    switch(range) {
+      case 'today':
+        start = end = new Date();
+        break;
+      case 'yesterday':
+        start = end = new Date();
+        start.setDate(start.getDate() - 1);
+        end.setDate(end.getDate() - 1);
+        break;
+      case 'last7days':
+        end = new Date();
+        start = new Date();
+        start.setDate(start.getDate() - 6);
+        break;
+      case 'thisMonth':
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date();
+        break;
+      case 'lastMonth':
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      default:
+        return;
+    }
+    
+    setStartDate(formatDate(start));
+    setEndDate(formatDate(end));
+  };
+  
+  // Is date selected function to highlight selected dates
+  const isDateSelected = (side, day) => {
+    if (!day) return false;
+    
+    const checkDate = new Date(
+      side === 'start' ? startYear : endYear,
+      side === 'start' ? startMonth : endMonth,
+      day
+    ).toISOString().split('T')[0];
+    
+    // Check if date is the selected start or end date
+    if (side === 'start' && checkDate === startDate) return true;
+    if (side === 'end' && checkDate === endDate) return true;
+    
+    // Check if date is in the selected range
+    if (startDate && endDate) {
+      return checkDate >= startDate && checkDate <= endDate;
+    }
+    
+    return false;
+  };
+
+  // Check if a date is today
+  const isToday = (side, day) => {
+    if (!day) return false;
+    const today = new Date();
+    const checkDate = new Date(
+      side === 'start' ? startYear : endYear,
+      side === 'start' ? startMonth : endMonth,
+      day
+    );
+    return today.getDate() === day && 
+           today.getMonth() === (side === 'start' ? startMonth : endMonth) && 
+           today.getFullYear() === (side === 'start' ? startYear : endYear);
+  };
 
   // Table sorting state
   const [sortField, setSortField] = useState('exit');
@@ -19,10 +192,142 @@ const ManageTrades = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
+  const [totalItems, setTotalItems] = useState(25);
 
-  // Sample data (empty for now)
-  const [trades, setTrades] = useState([]);
+  // Sample data
+  const [trades, setTrades] = useState([
+    {
+      symbol: 'AAPL',
+      entry: '150 @ $182.63 | 2023-09-15',
+      exit: '150 @ $195.18 | 2023-11-22',
+      pl: '+6.87% ($1,882.50)',
+      potential: '$2,450.00'
+    },
+    {
+      symbol: 'MSFT',
+      entry: '75 @ $325.42 | 2023-10-05',
+      exit: '75 @ $376.17 | 2023-12-10',
+      pl: '+15.60% ($3,806.25)',
+      potential: '$4,200.00'
+    },
+    {
+      symbol: 'GOOGL',
+      entry: '30 @ $132.58 | 2023-09-20',
+      exit: '30 @ $139.82 | 2023-12-01',
+      pl: '+5.46% ($217.20)',
+      potential: '$360.00'
+    },
+    {
+      symbol: 'AMZN',
+      entry: '40 @ $127.86 | 2023-10-12',
+      exit: '40 @ $146.38 | 2023-12-15',
+      pl: '+14.48% ($740.80)',
+      potential: '$920.00'
+    },
+    {
+      symbol: 'TSLA',
+      entry: '20 @ $245.20 | 2023-09-08',
+      exit: '20 @ $239.45 | 2023-11-30',
+      pl: '-2.34% ($-115.00)',
+      potential: '$180.00'
+    },
+    {
+      symbol: 'NFLX',
+      entry: '15 @ $398.75 | 2023-10-03',
+      exit: '15 @ $482.95 | 2023-12-18',
+      pl: '+21.12% ($1,263.00)',
+      potential: '$1,500.00'
+    },
+    {
+      symbol: 'META',
+      entry: '25 @ $286.34 | 2023-09-25',
+      exit: '25 @ $334.92 | 2023-12-05',
+      pl: '+16.97% ($1,214.50)',
+      potential: '$1,375.00'
+    },
+    {
+      symbol: 'NVDA',
+      entry: '18 @ $412.61 | 2023-10-20',
+      exit: '18 @ $485.09 | 2023-12-20',
+      pl: '+17.57% ($1,304.64)',
+      potential: '$1,620.00'
+    }
+  ]);
+
+
+
+  // Search filtering effect
+  useEffect(() => {
+    const dummyTrades = [
+      {
+        symbol: 'AAPL',
+        entry: '150 @ $182.63 | 2023-09-15',
+        exit: '150 @ $195.18 | 2023-11-22',
+        pl: '+6.87% ($1,882.50)',
+        potential: '$2,450.00'
+      },
+      {
+        symbol: 'MSFT',
+        entry: '75 @ $325.42 | 2023-10-05',
+        exit: '75 @ $376.17 | 2023-12-10',
+        pl: '+15.60% ($3,806.25)',
+        potential: '$4,200.00'
+      },
+      {
+        symbol: 'GOOGL',
+        entry: '30 @ $132.58 | 2023-09-20',
+        exit: '30 @ $139.82 | 2023-12-01',
+        pl: '+5.46% ($217.20)',
+        potential: '$360.00'
+      },
+      {
+        symbol: 'AMZN',
+        entry: '40 @ $127.86 | 2023-10-12',
+        exit: '40 @ $146.38 | 2023-12-15',
+        pl: '+14.48% ($740.80)',
+        potential: '$920.00'
+      },
+      {
+        symbol: 'TSLA',
+        entry: '20 @ $245.20 | 2023-09-08',
+        exit: '20 @ $239.45 | 2023-11-30',
+        pl: '-2.34% ($-115.00)',
+        potential: '$180.00'
+      },
+      {
+        symbol: 'NFLX',
+        entry: '15 @ $398.75 | 2023-10-03',
+        exit: '15 @ $482.95 | 2023-12-18',
+        pl: '+21.12% ($1,263.00)',
+        potential: '$1,500.00'
+      },
+      {
+        symbol: 'META',
+        entry: '25 @ $286.34 | 2023-09-25',
+        exit: '25 @ $334.92 | 2023-12-05',
+        pl: '+16.97% ($1,214.50)',
+        potential: '$1,375.00'
+      },
+      {
+        symbol: 'NVDA',
+        entry: '18 @ $412.61 | 2023-10-20',
+        exit: '18 @ $485.09 | 2023-12-20',
+        pl: '+17.57% ($1,304.64)',
+        potential: '$1,620.00'
+      }
+    ];
+
+    if (searchSymbol) {
+      const filtered = dummyTrades.filter(trade =>
+        trade.symbol.toLowerCase().includes(searchSymbol.toLowerCase())
+      );
+      setTrades(filtered);
+      setTotalItems(filtered.length);
+    } else {
+      setTrades(dummyTrades);
+      setTotalItems(dummyTrades.length);
+    }
+  }, [searchSymbol]);
 
   const incrementSL = () => {
     setSlPercentage(prev => parseFloat((prev + 0.5).toFixed(1)));
@@ -46,23 +351,36 @@ const ManageTrades = () => {
   };
 
   const handleSave = () => {
-    console.log({
-      name: newTradeBookName,
-      initialCapital: initialCapital,
-      includeOpenPositions: includeOpenPositions
-    });
+    if (newTradeBookName.trim()) {
+      setTradeBooks([...tradeBooks, newTradeBookName]);
+      setActiveTradeBook(newTradeBookName);
+
+      // Show success toast (you could add a toast library for better UX)
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg animate-fade-in';
+      toast.textContent = `Trade book "${newTradeBookName}" created successfully!`;
+      document.body.appendChild(toast);
+      setTimeout(() => document.body.removeChild(toast), 3000);
+    }
     closeModal();
   };
 
   // Handle column sorting
   const handleSort = (field) => {
     if (field === sortField) {
-      // Toggle direction if clicking the same field
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      // Set new field and default to ascending
       setSortField(field);
       setSortDirection('asc');
+    }
+
+    // Add subtle animation to indicate sort action
+    const thElement = document.querySelector(`th[data-sort="${field}"]`);
+    if (thElement) {
+      thElement.classList.add('bg-gray-300');
+      setTimeout(() => {
+        thElement.classList.remove('bg-gray-300');
+      }, 300);
     }
   };
 
@@ -86,89 +404,294 @@ const ManageTrades = () => {
   return (
     <div className="p-6 w-full bg-gray-100">
       <div className="flex items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Manage Trades</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Manage Trades</h2>
         <button
           onClick={openModal}
-          className="ml-3 text-white flex items-center justify-center rounded-full w-8 h-8 hover:bg-blue-600 transition-colors duration-200 ease-in-out"
-          style={{ backgroundColor: "rgb(96,98,255)" }}
+          className="ml-3 text-white flex items-center justify-center rounded-full w-8 h-8 transition-all duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+          style={{
+            backgroundColor: "rgb(96,98,255)",
+            width: "32px",  // Explicit width
+            height: "32px", // Same as width for perfect circle
+            borderRadius: "50%" // Ensures perfect circular shape
+          }}
           aria-label="Add new trade book"
+          title="Create new trade book"
         >
-          <span className="text-lg font-semibold leading-none">+</span>
+          <Plus size={16} /> {/* Using the Lucide Plus icon for better centering */}
         </button>
       </div>
 
       <div className="mb-6 flex flex-wrap items-end gap-6">
-        {/* Search by symbol */}
+        {/* Search by symbol with autocomplete effect */}
         <div className="flex flex-col">
-          <label className="mb-2 text-sm font-medium text-gray-700">Search by symbol:</label>
-          <input
-            type="text"
-            placeholder="Enter symbol..."
-            value={searchSymbol}
-            onChange={(e) => setSearchSymbol(e.target.value)}
-            className="border px-4 py-2 rounded-md w-60 text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500 transition duration-200"
-          />
-        </div>
-
-        {/* Sell Date Range */}
-        <div className="flex flex-col">
-          <label className="mb-2 text-sm font-medium text-gray-700">Sell Date Range:</label>
-          <div className="flex space-x-3">
-            <div className="relative">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                onFocus={() => setIsStartDateFocused(true)}
-                onBlur={() => setIsStartDateFocused(false)}
-                className={`
-                  border px-3 py-2 rounded-md text-gray-700 
-                  focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500
-                  ${isStartDateFocused ? 'bg-cyan-50 border-cyan-400' : ''}
-                  transition duration-200
-                `}
-                onClick={(e) => e.target.showPicker()}
-              />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
+          {/* <label className="mb-2 text-sm font-medium text-gray-700">Search by symbol:</label> */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by symbol ..."
+              value={searchSymbol}
+              onChange={(e) => setSearchSymbol(e.target.value)}
+              className="border pl-10 pr-4 py-2 rounded-md w-60 text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500 transition duration-200"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
             </div>
-
-            <span className="self-center text-gray-500 font-medium">to</span>
-
-            <div className="relative">
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                onFocus={() => setIsEndDateFocused(true)}
-                onBlur={() => setIsEndDateFocused(false)}
-                className={`
-                  border px-3 py-2 rounded-md text-gray-700 
-                  focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500
-                  ${isEndDateFocused ? 'bg-cyan-50 border-cyan-400' : ''}
-                  transition duration-200
-                `}
-                onClick={(e) => e.target.showPicker()}
-              />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            {searchSymbol && (
+              <button
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                onClick={() => setSearchSymbol('')}
+              >
+                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-              </div>
-            </div>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* SL % */}
+        <div className="flex flex-col">
+          <label className="mb-2 text-sm font-medium text-black">Select Date Range:</label>
+          <div className="relative w-full">
+            <div
+              className="border px-3 py-2 rounded-md text-black flex items-center gap-2 cursor-pointer hover:bg-gray-50 w-full md:w-64"
+              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+            >
+              <Calendar className="w-5 h-5 text-gray-600" />
+              <span>
+                {startDate && endDate
+                  ? `${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`
+                  : "Select Date Range"}
+              </span>
+              <ChevronDown
+                className={`ml-auto w-5 h-5 text-gray-600 transition-transform duration-200 ${isDatePickerOpen ? 'transform rotate-180' : ''}`}
+              />
+            </div>
+
+            {/* Date picker dropdown */}
+            {isDatePickerOpen && (
+              <div className="absolute z-10 mt-1 bg-white border rounded-lg shadow-lg w-full md:w-[640px] p-4 animate-fade-in">
+                <div className={`${isMobile ? 'flex flex-col' : 'flex'} gap-4`}>
+                  {/* Start date calendar */}
+                  <div className={`${isMobile ? 'w-full' : 'w-1/2'}`}>
+                    <p className="text-sm font-medium text-black mb-2">Start Date</p>
+                    <div className="border rounded-md p-3">
+                      {/* Calendar header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          onClick={() => changeMonth('start', 'prev')}
+                          className="p-1 rounded-full hover:bg-gray-100"
+                        >
+                          <ChevronLeft className="w-5 h-5 text-gray-500" />
+                        </button>
+                        <div className="flex items-center gap-1">
+                          <select
+                            value={monthNames[startMonth]}
+                            onChange={(e) => setStartMonth(monthNames.indexOf(e.target.value))}
+                            className="text-gray-700 font-medium bg-transparent focus:outline-none"
+                          >
+                            {monthNames.map(month => (
+                              <option key={month} value={month}>{month}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={startYear}
+                            onChange={(e) => setStartYear(parseInt(e.target.value))}
+                            className="text-gray-700 font-medium bg-transparent focus:outline-none"
+                          >
+                            {Array.from({ length: 10 }, (_, i) => startYear - 5 + i).map(year => (
+                              <option key={year} value={year}>{year}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <button
+                          onClick={() => changeMonth('start', 'next')}
+                          className="p-1 rounded-full hover:bg-gray-100"
+                        >
+                          <ChevronRight className="w-5 h-5 text-gray-500" />
+                        </button>
+                      </div>
+
+                      {/* Days of week */}
+                      <div className="grid grid-cols-7 gap-1 mb-1">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                          <div key={day} className="text-xs text-center text-gray-500 font-medium">
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Calendar days */}
+                      <div className="grid grid-cols-7 gap-1">
+                        {generateCalendarDays(startYear, startMonth).map((dateObj, idx) => (
+                          <div
+                            key={`start-${idx}`}
+                            onClick={() => dateObj.isCurrentMonth && handleDateSelect('start', dateObj.day)}
+                            className={`
+                          h-8 flex items-center justify-center text-sm rounded-full
+                          ${!dateObj.isCurrentMonth ? 'text-gray-300' : 'cursor-pointer hover:bg-gray-100 text-black'}
+                          ${isDateSelected('start', dateObj.day) ? 'bg-cyan-500 text-white hover:bg-cyan-600' : ''}
+                          ${isToday('start', dateObj.day) && !isDateSelected('start', dateObj.day) ? 'border border-cyan-500' : ''}
+                        `}
+                          >
+                            {dateObj.day}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* End date calendar */}
+                  <div className={`${isMobile ? 'w-full mt-4' : 'w-1/2'}`}>
+                    <p className="text-sm font-medium text-black mb-2">End Date</p>
+                    <div className="border rounded-md p-3">
+                      {/* Calendar header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          onClick={() => changeMonth('end', 'prev')}
+                          className="p-1 rounded-full hover:bg-gray-100"
+                        >
+                          <ChevronLeft className="w-5 h-5 text-gray-500" />
+                        </button>
+                        <div className="flex items-center gap-1">
+                          <select
+                            value={monthNames[endMonth]}
+                            onChange={(e) => setEndMonth(monthNames.indexOf(e.target.value))}
+                            className="text-gray-700 font-medium bg-transparent focus:outline-none"
+                          >
+                            {monthNames.map(month => (
+                              <option key={month} value={month}>{month}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={endYear}
+                            onChange={(e) => setEndYear(parseInt(e.target.value))}
+                            className="text-gray-700 font-medium bg-transparent focus:outline-none"
+                          >
+                            {Array.from({ length: 10 }, (_, i) => endYear - 5 + i).map(year => (
+                              <option key={year} value={year}>{year}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <button
+                          onClick={() => changeMonth('end', 'next')}
+                          className="p-1 rounded-full hover:bg-gray-100"
+                        >
+                          <ChevronRight className="w-5 h-5 text-gray-500" />
+                        </button>
+                      </div>
+
+                      {/* Days of week */}
+                      <div className="grid grid-cols-7 gap-1 mb-1">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                          <div key={day} className="text-xs text-center text-gray-500 font-medium">
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Calendar days */}
+                      <div className="grid grid-cols-7 gap-1">
+                        {generateCalendarDays(endYear, endMonth).map((dateObj, idx) => (
+                          <div
+                            key={`end-${idx}`}
+                            onClick={() => dateObj.isCurrentMonth && handleDateSelect('end', dateObj.day)}
+                            className={`
+                          h-8 flex items-center justify-center text-sm rounded-full
+                          ${!dateObj.isCurrentMonth ? 'text-gray-300' : 'cursor-pointer hover:bg-gray-100 text-black'}
+                          ${isDateSelected('end', dateObj.day) ? 'bg-cyan-500 text-white hover:bg-cyan-600' : ''}
+                          ${isToday('end', dateObj.day) && !isDateSelected('end', dateObj.day) ? 'border border-cyan-500' : ''}
+                        `}
+                          >
+                            {dateObj.day}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick selection options */}
+                <div className="mt-4 border-t pt-3">
+                  <p className="text-xs font-medium text-gray-700 mb-2">QUICK SELECT</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setDateRange('today')}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors flex items-center
+                    ${startDate === formatDate(new Date()) && endDate === formatDate(new Date())
+                          ? 'bg-cyan-100 text-cyan-700 border border-cyan-200'
+                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700'}`}
+                    >
+                      Today
+                    </button>
+                    <button
+                      onClick={() => setDateRange('yesterday')}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors flex items-center
+                    ${startDate === formatDate(new Date(new Date().setDate(new Date().getDate() - 1))) &&
+                          endDate === formatDate(new Date(new Date().setDate(new Date().getDate() - 1)))
+                          ? 'bg-cyan-100 text-cyan-700 border border-cyan-200'
+                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700'}`}
+                    >
+                      Yesterday
+                    </button>
+                    <button
+                      onClick={() => setDateRange('last7days')}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors flex items-center
+                    ${startDate === formatDate(new Date(new Date().setDate(new Date().getDate() - 6))) &&
+                          endDate === formatDate(new Date())
+                          ? 'bg-cyan-100 text-cyan-700 border border-cyan-200'
+                          : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700'}`}
+                    >
+                      Last 7 days
+                    </button>
+                    <button
+                      onClick={() => setDateRange('thisMonth')}
+                      className="px-3 py-1.5 text-sm rounded-md transition-colors flex items-center bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700"
+                    >
+                      This month
+                    </button>
+                    <button
+                      onClick={() => setDateRange('lastMonth')}
+                      className="px-3 py-1.5 text-sm rounded-md transition-colors flex items-center bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700"
+                    >
+                      Last month
+                    </button>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="mt-4 flex justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      setStartDate("");
+                      setEndDate("");
+                      setIsDatePickerOpen(false);
+                    }}
+                    className="px-4 py-2 text-black rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={() => setIsDatePickerOpen(false)}
+                    className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors"
+                    disabled={!startDate || !endDate}
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* SL % with improved interaction */}
         <div className="flex flex-col">
           <label className="mb-2 text-sm font-medium text-gray-700">SL (%):</label>
           <div className="flex">
             <button
               onClick={decrementSL}
-              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-l-md border border-r-0 hover:bg-gray-300 transition-colors"
+              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-l-md border border-r-0 hover:bg-gray-300 transition-colors active:bg-gray-400"
             >
               -
             </button>
@@ -181,18 +704,25 @@ const ManageTrades = () => {
             />
             <button
               onClick={incrementSL}
-              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md border border-l-0 hover:bg-gray-300 transition-colors"
+              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md border border-l-0 hover:bg-gray-300 transition-colors active:bg-gray-400"
             >
               +
             </button>
           </div>
         </div>
 
-        {/* Load dropdown */}
+        {/* Load dropdown with trade books */}
         <div className="ml-auto">
           <label className="block mb-2 text-sm font-medium text-gray-700">Load:</label>
-          <select className="border px-4 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500 transition duration-200">
+          <select
+            className="border px-4 py-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500 transition duration-200"
+            value={activeTradeBook}
+            onChange={(e) => setActiveTradeBook(e.target.value)}
+          >
             <option value="">--</option>
+            {tradeBooks.map((book, index) => (
+              <option key={index} value={book}>{book}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -202,45 +732,106 @@ const ManageTrades = () => {
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
-              <th className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold" onClick={() => handleSort('symbol')}>
-                Symbol
-              </th>
-              <th className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold text-center" onClick={() => handleSort('entry')}>
-                <div>Entry</div>
-                <span className="font-normal text-gray-600">Qty <span className="mx-1 text-gray-400">|</span> Price <span className="mx-1 text-gray-400">|</span> Date/Time</span>
-              </th>
-              <th className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer group relative font-semibold text-center" onClick={() => handleSort('exit')}>
-                <div>Exit</div>
-                <div className="flex items-center justify-center">
-                  <span className="font-normal text-gray-600">Qty <span className="mx-1 text-gray-400">|</span> Price <span className="mx-1 text-gray-400">|</span> Date/Time</span>
-                  <div className="ml-1">
+              <th data-sort="symbol" className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold" onClick={() => handleSort('symbol')}>
+                <div className="flex items-center">
+                  <span>Symbol</span>
+                  {sortField === 'symbol' && (
                     <svg
-                      className={`w-4 h-4 transition-transform ${sortField === 'exit' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'} ${sortField === 'exit' && sortDirection === 'desc' ? 'rotate-180 text-blue-600' : ''}`}
+                      className={`ml-1 w-4 h-4 transition-transform ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`}
                       fill="none"
-                      viewBox="0 0 24 24"
                       stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                     </svg>
-                  </div>
+                  )}
                 </div>
               </th>
-              <th className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold" onClick={() => handleSort('pl')}>
-                P/L % (₹)
+              <th data-sort="entry" className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold text-center" onClick={() => handleSort('entry')}>
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center">
+                    <span>Entry</span>
+                    {sortField === 'entry' && (
+                      <svg
+                        className={`ml-1 w-4 h-4 transition-transform ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="font-normal text-gray-600 text-xs">Qty <span className="mx-1 text-gray-400">|</span> Price <span className="mx-1 text-gray-400">|</span> Date/Time</span>
+                </div>
               </th>
-              <th className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold" onClick={() => handleSort('potential')}>
-                Potential P/L (₹)
+              <th data-sort="exit" className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer group relative font-semibold text-center" onClick={() => handleSort('exit')}>
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center">
+                    <span>Exit</span>
+                    {sortField === 'exit' && (
+                      <svg
+                        className={`ml-1 w-4 h-4 transition-transform ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="font-normal text-gray-600 text-xs">Qty <span className="mx-1 text-gray-400">|</span> Price <span className="mx-1 text-gray-400">|</span> Date/Time</span>
+                </div>
+              </th>
+              <th data-sort="pl" className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold" onClick={() => handleSort('pl')}>
+                <div className="flex items-center">
+                  <span>P/L % (₹)</span>
+                  {sortField === 'pl' && (
+                    <svg
+                      className={`ml-1 w-4 h-4 transition-transform ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  )}
+                </div>
+              </th>
+              <th data-sort="potential" className="px-4 py-3 hover:bg-gray-300 transition-colors cursor-pointer font-semibold" onClick={() => handleSort('potential')}>
+                <div className="flex items-center">
+                  <span>Potential P/L (₹)</span>
+                  {sortField === 'potential' && (
+                    <svg
+                      className={`ml-1 w-4 h-4 transition-transform ${sortDirection === 'asc' ? '' : 'transform rotate-180'}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  )}
+                </div>
               </th>
             </tr>
           </thead>
           <tbody>
             {trades.length > 0 ? (
               trades.map((trade, index) => (
-                <tr key={index} className="border-t hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">{trade.symbol}</td>
-                  <td className="px-4 py-3">{trade.entry}</td>
-                  <td className="px-4 py-3">{trade.exit}</td>
-                  <td className="px-4 py-3">{trade.pl}</td>
+                <tr
+                  key={index}
+                  className={`border-t hover:bg-gray-50 transition-colors ${trade.pl.startsWith('+') ? 'hover:bg-green-50' : trade.pl.startsWith('-') ? 'hover:bg-red-50' : ''
+                    }`}
+                >
+                  <td className="px-4 py-3">
+                    <span className="font-medium">{trade.symbol}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">{trade.entry}</td>
+                  <td className="px-4 py-3 text-center">{trade.exit}</td>
+                  <td className={`px-4 py-3 font-medium ${trade.pl.startsWith('+') ? 'text-green-600' : trade.pl.startsWith('-') ? 'text-red-600' : ''
+                    }`}>
+                    {trade.pl}
+                  </td>
                   <td className="px-4 py-3">{trade.potential}</td>
                 </tr>
               ))
@@ -253,36 +844,48 @@ const ManageTrades = () => {
         </table>
       </div>
 
-      {/* Functional pagination */}
+      {/* Functional pagination with improved styling */}
       <div className="mt-4 flex justify-center text-sm text-gray-600 items-center">
         <button
           onClick={prevPage}
           disabled={currentPage === 1}
-          className={`px-3 py-2 rounded-md ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'}`}
+          className={`px-3 py-2 rounded-md flex items-center justify-center transition-all ${currentPage === 1
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-700 hover:bg-gray-200 hover:shadow-sm active:bg-gray-300'
+            }`}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-5 h-5" />
         </button>
         <span className="mx-6 font-medium">
-          Showing {totalItems > 0 ? startItem : 0} - {endItem} of {totalItems}
+          Showing <span className="text-blue-600">{totalItems > 0 ? startItem : 0}</span> - <span className="text-blue-600">{endItem}</span> of <span className="text-blue-600">{totalItems}</span>
         </span>
         <button
           onClick={nextPage}
           disabled={endItem >= totalItems}
-          className={`px-3 py-2 rounded-md ${endItem >= totalItems ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'}`}
+          className={`px-3 py-2 rounded-md flex items-center justify-center transition-all ${endItem >= totalItems
+            ? 'text-gray-400 cursor-not-allowed'
+            : 'text-gray-700 hover:bg-gray-200 hover:shadow-sm active:bg-gray-300'
+            }`}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Modal with improved animation */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Trade Book</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Create New Trade Book</h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+              >
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
             <div className="space-y-4">
               <div>
@@ -295,6 +898,7 @@ const ManageTrades = () => {
                   value={newTradeBookName}
                   onChange={(e) => setNewTradeBookName(e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  autoFocus
                 />
               </div>
 
@@ -331,13 +935,14 @@ const ManageTrades = () => {
             <div className="mt-6 flex justify-end space-x-4">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors transform hover:scale-105"
+                disabled={!newTradeBookName.trim()}
               >
                 Save
               </button>
@@ -345,6 +950,27 @@ const ManageTrades = () => {
           </div>
         </div>
       )}
+
+      {/* Add these CSS animations to your global CSS */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out;
+        }
+        
+        .animate-slide-up {
+          animation: slideUp 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

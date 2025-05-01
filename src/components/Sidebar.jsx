@@ -1,8 +1,11 @@
 // components/Sidebar.jsx
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, Plus, List, Book, NotebookPen, Search, HelpCircle } from 'lucide-react';
 
 const Sidebar = ({ isOpen }) => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
   return (
     <div className={`
       fixed z-[100] top-0 bottom-0 bg-[#3f4d67] w-[250px] 
@@ -13,20 +16,20 @@ const Sidebar = ({ isOpen }) => {
     `}>
       {/* Logo */}
       <div>
-      <Link to="/" className="block p-6 text-2xl font-bold text-center hover:opacity-90">
-  <span className="text-blue-400">CHARTS</span><span className="text-green-400">MAZE</span>
-</Link>
+        <Link to="/" className="block p-6 text-2xl font-bold text-center hover:opacity-90">
+          <span className="text-blue-400">CHARTS</span><span className="text-green-400">MAZE</span>
+        </Link>
 
         {/* Navigation */}
         <nav className="flex flex-col gap-2 px-4 py-8">
-          <SidebarLink to="/" icon={<Book size={20} />} text="My Rule Book" />
-          <SidebarLink to="/" icon={<Plus size={20} />} text="Add Trades" />
-          <SidebarLink to="/manage-trades" icon={<List size={20} />} text="Manage Trades" />
-          <SidebarLink to="/open-positions" icon={<NotebookPen size={20} />} text="Open Positions" />
-          <SidebarLink to="/dashboard" icon={<Home size={20} />} text="Dashboard" />
-          <SidebarLink to="/trade-diary" icon={<NotebookPen size={20} />} text="Trade Diary" />
-          <SidebarLink to="/screener" icon={<Search size={20} />} text="ChartsMaze Screener" />
-          <SidebarLink to="/help" icon={<HelpCircle size={20} />} text="Help or Feedback" />
+          <SidebarLink to="/" icon={<Book size={20} />} text="My Rule Book" isActive={currentPath === '/'} />
+          <SidebarLink to="/add-trades" icon={<Plus size={20} />} text="Add Trades" isActive={currentPath === '/add-trades'} />
+          <SidebarLink to="/manage-trades" icon={<List size={20} />} text="Manage Trades" isActive={currentPath === '/manage-trades'} />
+          <SidebarLink to="/open-positions" icon={<NotebookPen size={20} />} text="Open Positions" isActive={currentPath === '/open-positions'} />
+          <SidebarLink to="/dashboard" icon={<Home size={20} />} text="Dashboard" isActive={currentPath === '/dashboard'} />
+          <SidebarLink to="/trade-diary" icon={<NotebookPen size={20} />} text="Trade Diary" isActive={currentPath === '/trade-diary'} />
+          <SidebarLink to="/screener" icon={<Search size={20} />} text="ChartsMaze Screener" isActive={currentPath === '/screener'} />
+          <SidebarLink to="/help" icon={<HelpCircle size={20} />} text="Help or Feedback" isActive={currentPath === '/help'} />
         </nav>
       </div>
 
@@ -42,13 +45,22 @@ const Sidebar = ({ isOpen }) => {
   );
 };
 
-const SidebarLink = ({ to, icon, text }) => (
+const SidebarLink = ({ to, icon, text, isActive }) => (
   <Link
     to={to}
-    className="flex items-center gap-3 p-2 rounded-md hover:bg-slate-700 transition-colors"
+    className={`
+      flex items-center gap-3 p-2 rounded-md transition-all duration-200
+      ${isActive 
+        ? 'bg-slate-600 shadow-md border-l-4 border-blue-400 pl-3' 
+        : 'hover:bg-slate-700 text-white'}
+    `}
   >
-    {icon}
-    <span>{text}</span>
+    <span className={`${isActive ? 'text-white' : 'text-gray-300'}`}>
+      {icon}
+    </span>
+    <span className={`${isActive ? 'text-white font-medium' : 'text-gray-300'}`}>
+      {text}
+    </span>
   </Link>
 );
 
