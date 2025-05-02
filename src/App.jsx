@@ -4,12 +4,11 @@ import './App.css';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import ManageTrades from './components/ManageTrades';
-import OpenPositions from './components/OpenPositions'; // Import the new component
+import OpenPositions from './components/OpenPositions'; 
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // This ensures we see state changes in the console for debugging
   useEffect(() => {
     console.log("Sidebar state:", isSidebarOpen);
   }, [isSidebarOpen]);
@@ -46,7 +45,6 @@ function App() {
   return (
     <Router>
       <div className="flex h-screen w-screen bg-gray-100 overflow-hidden">
-        {/* Overlay when sidebar is open on mobile */}
         {isSidebarOpen && (
           <div 
             className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
@@ -54,7 +52,6 @@ function App() {
           />
         )}
 
-        {/* Sidebar */}
         <aside
           className={`
             fixed top-0 left-0 h-full z-20
@@ -65,7 +62,6 @@ function App() {
           <Sidebar isOpen={isSidebarOpen} />
         </aside>
 
-        {/* Floating hamburger button that follows sidebar */}
         <div 
           className={`
             fixed top-4 z-30 transition-all duration-300 ease-in-out
@@ -103,7 +99,6 @@ function App() {
             </svg>
           </button>
           
-          {/* Logo text next to hamburger when sidebar is closed */}
           {!isSidebarOpen && (
             <div className="font-bold text-xl text-gray-800 bg-white px-3 py-2 rounded-lg shadow-lg">
               CHARTSMAZE
@@ -111,7 +106,6 @@ function App() {
           )}
         </div>
 
-        {/* Main content with routes */}
         <main className={`
           flex-1 transition-all duration-300
           ${isSidebarOpen ? 'ml-64' : 'ml-0'}
