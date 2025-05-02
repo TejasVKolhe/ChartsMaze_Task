@@ -10,11 +10,11 @@ const OpenPositions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTradeBookName, setNewTradeBookName] = useState('');
   const [includeOpenPositions, setIncludeOpenPositions] = useState(false);
-  
+
   // Sorting state
   const [sortField, setSortField] = useState('daysHeld');
   const [sortDirection, setSortDirection] = useState('desc');
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -76,8 +76,8 @@ const OpenPositions = () => {
     if (sortField !== field) {
       return <span className="text-gray-400">•</span>;
     }
-    return sortDirection === 'asc' ? 
-      <ArrowUp size={16} className="text-gray-700" /> : 
+    return sortDirection === 'asc' ?
+      <ArrowUp size={16} className="text-gray-700" /> :
       <ArrowDown size={16} className="text-gray-700" />;
   };
 
@@ -98,7 +98,7 @@ const OpenPositions = () => {
 
         <div className="flex items-center gap-3">
           <span className="text-gray-700 font-medium">Load:</span>
-          <select 
+          <select
             className="rounded-lg border border-gray-300 px-4 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm min-w-[180px]"
             value={selectedTradeBook}
             onChange={(e) => setSelectedTradeBook(e.target.value)}
@@ -145,8 +145,8 @@ const OpenPositions = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 {/* Symbol column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('symbol')}
                 >
                   <div className="flex items-center gap-2">
@@ -154,10 +154,10 @@ const OpenPositions = () => {
                     <SortIndicator field="symbol" />
                   </div>
                 </th>
-                
+
                 {/* Position Size column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('positionSize')}
                 >
                   <div className="flex items-center gap-2">
@@ -168,10 +168,10 @@ const OpenPositions = () => {
                     <SortIndicator field="positionSize" />
                   </div>
                 </th>
-                
+
                 {/* Days Held column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('daysHeld')}
                 >
                   <div className="flex items-center gap-2">
@@ -179,10 +179,10 @@ const OpenPositions = () => {
                     <SortIndicator field="daysHeld" />
                   </div>
                 </th>
-                
+
                 {/* SL column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('sl')}
                 >
                   <div className="flex items-center gap-2">
@@ -190,10 +190,10 @@ const OpenPositions = () => {
                     <SortIndicator field="sl" />
                   </div>
                 </th>
-                
+
                 {/* Open Risk column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('openRisk')}
                 >
                   <div className="flex items-center gap-2">
@@ -204,10 +204,10 @@ const OpenPositions = () => {
                     <SortIndicator field="openRisk" />
                   </div>
                 </th>
-                
+
                 {/* Unrealized P/L column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('unrealizedPL')}
                 >
                   <div className="flex items-center gap-2">
@@ -218,10 +218,10 @@ const OpenPositions = () => {
                     <SortIndicator field="unrealizedPL" />
                   </div>
                 </th>
-                
+
                 {/* R Multiples column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('rMultiples')}
                 >
                   <div className="flex items-center gap-2">
@@ -229,10 +229,10 @@ const OpenPositions = () => {
                     <SortIndicator field="rMultiples" />
                   </div>
                 </th>
-                
+
                 {/* Portfolio Gain column */}
-                <th 
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100" 
+                <th
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('portfolioGain')}
                 >
                   <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ const OpenPositions = () => {
                     <SortIndicator field="portfolioGain" />
                   </div>
                 </th>
-                
+
                 {/* Actions column */}
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
                   <span>Actions</span>
@@ -282,7 +282,7 @@ const OpenPositions = () => {
             </tbody>
           </table>
         </div>
-        
+
         {/* Improved pagination */}
         <div className="flex items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50">
           <div className="text-sm text-gray-700">
@@ -292,27 +292,25 @@ const OpenPositions = () => {
               <span>No positions</span>
             )}
           </div>
-          
+
           <div className="flex items-center gap-2">
             <button
               onClick={prevPage}
               disabled={currentPage === 1}
-              className={`flex items-center justify-center h-8 w-8 rounded-md ${
-                currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`flex items-center justify-center h-8 w-8 rounded-md ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
+                }`}
               aria-label="Previous page"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            
+
             <span className="text-sm text-gray-700 font-medium">{currentPage}</span>
-            
+
             <button
               onClick={nextPage}
               disabled={endItem >= totalItems}
-              className={`flex items-center justify-center h-8 w-8 rounded-md ${
-                endItem >= totalItems ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`flex items-center justify-center h-8 w-8 rounded-md ${endItem >= totalItems ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
+                }`}
               aria-label="Next page"
             >
               <ChevronRight className="h-5 w-5" />
@@ -321,12 +319,21 @@ const OpenPositions = () => {
         </div>
       </div>
 
-      {/* Improved modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Create New Trade Book</h3>
-            
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-slide-up transition-all duration-300 ease-out">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">Create New Trade Book</h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -334,29 +341,30 @@ const OpenPositions = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter trade book name"
+                  placeholder="e.g., Swing Trades, Nifty Strategy"
                   value={newTradeBookName}
                   onChange={(e) => setNewTradeBookName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  autoFocus
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Initial Total Capital
+                  Initial Total Capital (Portfolio + Cash)
                 </label>
                 <input
                   type="number"
-                  placeholder="Enter amount"
+                  placeholder="₹ e.g., 100000"
                   value={initialCapital}
                   onChange={(e) => setInitialCapital(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Initial Total Capital will affect portfolio level P&L calculations. Set to 0 if unknown.
+                  Used for calculating portfolio-level P&L. If unknown, enter 0.
                 </p>
               </div>
-              
+
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -370,17 +378,18 @@ const OpenPositions = () => {
                 </label>
               </div>
             </div>
-            
-            <div className="mt-6 flex justify-end gap-3">
+
+            <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                disabled={!newTradeBookName.trim()}
+                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition transform hover:scale-105 disabled:opacity-50"
               >
                 Save
               </button>
@@ -388,6 +397,7 @@ const OpenPositions = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

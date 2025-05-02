@@ -12,13 +12,13 @@ const ManageTrades = () => {
   const [activeTradeBook, setActiveTradeBook] = useState('');
 
   const [isMobile, setIsMobile] = useState(false);
-  
+
   // Check window size on mount and resize
   useEffect(() => {
     const checkSize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkSize();
     window.addEventListener('resize', checkSize);
     return () => window.removeEventListener('resize', checkSize);
@@ -26,43 +26,43 @@ const ManageTrades = () => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  
+
   // Calendar state
   const today = new Date();
   const [startMonth, setStartMonth] = useState(today.getMonth());
   const [startYear, setStartYear] = useState(today.getFullYear());
   const [endMonth, setEndMonth] = useState(today.getMonth());
   const [endYear, setEndYear] = useState(today.getFullYear());
-  
+
   // Format date as YYYY-MM-DD
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
   };
-  
+
   // Generate days for calendar
   const generateCalendarDays = (year, month) => {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    
+
     // Get day of week for first day (0 = Sunday, 6 = Saturday)
     const firstDayOfWeek = firstDay.getDay();
-    
+
     const days = [];
-    
+
     // Add empty cells for days before first day of month
     for (let i = 0; i < firstDayOfWeek; i++) {
       days.push({ day: null, isCurrentMonth: false });
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push({ day, isCurrentMonth: true });
     }
-    
+
     return days;
   };
-  
+
   // Move calendar month
   const changeMonth = (side, direction) => {
     if (side === 'start') {
@@ -99,11 +99,11 @@ const ManageTrades = () => {
       }
     }
   };
-  
+
   // Get month name
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
-  
+
   // Handle date selection
   const handleDateSelect = (side, day) => {
     const date = new Date(side === 'start' ? startYear : endYear, side === 'start' ? startMonth : endMonth, day);
@@ -113,13 +113,13 @@ const ManageTrades = () => {
       setEndDate(formatDate(date));
     }
   };
-  
+
   // Preset date ranges
   const setDateRange = (range) => {
     const today = new Date();
     let start, end;
-    
-    switch(range) {
+
+    switch (range) {
       case 'today':
         start = end = new Date();
         break;
@@ -144,30 +144,30 @@ const ManageTrades = () => {
       default:
         return;
     }
-    
+
     setStartDate(formatDate(start));
     setEndDate(formatDate(end));
   };
-  
+
   // Is date selected function to highlight selected dates
   const isDateSelected = (side, day) => {
     if (!day) return false;
-    
+
     const checkDate = new Date(
       side === 'start' ? startYear : endYear,
       side === 'start' ? startMonth : endMonth,
       day
     ).toISOString().split('T')[0];
-    
+
     // Check if date is the selected start or end date
     if (side === 'start' && checkDate === startDate) return true;
     if (side === 'end' && checkDate === endDate) return true;
-    
+
     // Check if date is in the selected range
     if (startDate && endDate) {
       return checkDate >= startDate && checkDate <= endDate;
     }
-    
+
     return false;
   };
 
@@ -180,9 +180,9 @@ const ManageTrades = () => {
       side === 'start' ? startMonth : endMonth,
       day
     );
-    return today.getDate() === day && 
-           today.getMonth() === (side === 'start' ? startMonth : endMonth) && 
-           today.getFullYear() === (side === 'start' ? startYear : endYear);
+    return today.getDate() === day &&
+      today.getMonth() === (side === 'start' ? startMonth : endMonth) &&
+      today.getFullYear() === (side === 'start' ? startYear : endYear);
   };
 
   // Table sorting state
@@ -197,123 +197,123 @@ const ManageTrades = () => {
   // Sample data
   const [trades, setTrades] = useState([
     {
-      symbol: 'AAPL',
-      entry: '150 @ $182.63 | 2023-09-15',
-      exit: '150 @ $195.18 | 2023-11-22',
-      pl: '+6.87% ($1,882.50)',
-      potential: '$2,450.00'
+      symbol: 'RELIANCE',
+      entry: '50 @ ₹2,420.00 | 2023-09-15',
+      exit: '50 @ ₹2,580.00 | 2023-11-22',
+      pl: '+6.61% (₹8,000.00)',
+      potential: '₹9,200.00'
     },
     {
-      symbol: 'MSFT',
-      entry: '75 @ $325.42 | 2023-10-05',
-      exit: '75 @ $376.17 | 2023-12-10',
-      pl: '+15.60% ($3,806.25)',
-      potential: '$4,200.00'
+      symbol: 'TCS',
+      entry: '20 @ ₹3,260.00 | 2023-10-05',
+      exit: '20 @ ₹3,500.00 | 2023-12-10',
+      pl: '+7.36% (₹4,800.00)',
+      potential: '₹6,000.00'
     },
     {
-      symbol: 'GOOGL',
-      entry: '30 @ $132.58 | 2023-09-20',
-      exit: '30 @ $139.82 | 2023-12-01',
-      pl: '+5.46% ($217.20)',
-      potential: '$360.00'
+      symbol: 'INFY',
+      entry: '40 @ ₹1,400.00 | 2023-09-20',
+      exit: '40 @ ₹1,525.00 | 2023-12-01',
+      pl: '+8.93% (₹5,000.00)',
+      potential: '₹5,600.00'
     },
     {
-      symbol: 'AMZN',
-      entry: '40 @ $127.86 | 2023-10-12',
-      exit: '40 @ $146.38 | 2023-12-15',
-      pl: '+14.48% ($740.80)',
-      potential: '$920.00'
+      symbol: 'HDFCBANK',
+      entry: '35 @ ₹1,520.00 | 2023-10-12',
+      exit: '35 @ ₹1,640.00 | 2023-12-15',
+      pl: '+7.89% (₹4,200.00)',
+      potential: '₹4,800.00'
     },
     {
-      symbol: 'TSLA',
-      entry: '20 @ $245.20 | 2023-09-08',
-      exit: '20 @ $239.45 | 2023-11-30',
-      pl: '-2.34% ($-115.00)',
-      potential: '$180.00'
+      symbol: 'ITC',
+      entry: '100 @ ₹450.00 | 2023-09-08',
+      exit: '100 @ ₹420.00 | 2023-11-30',
+      pl: '-6.67% (₹-3,000.00)',
+      potential: '₹5,000.00'
     },
     {
-      symbol: 'NFLX',
-      entry: '15 @ $398.75 | 2023-10-03',
-      exit: '15 @ $482.95 | 2023-12-18',
-      pl: '+21.12% ($1,263.00)',
-      potential: '$1,500.00'
+      symbol: 'LT',
+      entry: '25 @ ₹2,800.00 | 2023-10-03',
+      exit: '25 @ ₹3,100.00 | 2023-12-18',
+      pl: '+10.71% (₹7,500.00)',
+      potential: '₹8,000.00'
     },
     {
-      symbol: 'META',
-      entry: '25 @ $286.34 | 2023-09-25',
-      exit: '25 @ $334.92 | 2023-12-05',
-      pl: '+16.97% ($1,214.50)',
-      potential: '$1,375.00'
+      symbol: 'BAJFINANCE',
+      entry: '10 @ ₹7,000.00 | 2023-09-25',
+      exit: '10 @ ₹7,750.00 | 2023-12-05',
+      pl: '+10.71% (₹7,500.00)',
+      potential: '₹8,500.00'
     },
     {
-      symbol: 'NVDA',
-      entry: '18 @ $412.61 | 2023-10-20',
-      exit: '18 @ $485.09 | 2023-12-20',
-      pl: '+17.57% ($1,304.64)',
-      potential: '$1,620.00'
+      symbol: 'HCLTECH',
+      entry: '30 @ ₹1,180.00 | 2023-10-20',
+      exit: '30 @ ₹1,320.00 | 2023-12-20',
+      pl: '+11.86% (₹4,200.00)',
+      potential: '₹4,800.00'
     }
   ]);
 
 
 
-  // Search filtering effect
+
   useEffect(() => {
     const dummyTrades = [
       {
-        symbol: 'AAPL',
-        entry: '150 @ $182.63 | 2023-09-15',
-        exit: '150 @ $195.18 | 2023-11-22',
-        pl: '+6.87% ($1,882.50)',
-        potential: '$2,450.00'
+        symbol: 'RELIANCE',
+        entry: '50 @ ₹2,420.00 | 2023-09-15',
+        exit: '50 @ ₹2,580.00 | 2023-11-22',
+        pl: '+6.61% (₹8,000.00)',
+        potential: '₹9,200.00'
       },
       {
-        symbol: 'MSFT',
-        entry: '75 @ $325.42 | 2023-10-05',
-        exit: '75 @ $376.17 | 2023-12-10',
-        pl: '+15.60% ($3,806.25)',
-        potential: '$4,200.00'
+        symbol: 'TCS',
+        entry: '20 @ ₹3,260.00 | 2023-10-05',
+        exit: '20 @ ₹3,500.00 | 2023-12-10',
+        pl: '+7.36% (₹4,800.00)',
+        potential: '₹6,000.00'
       },
       {
-        symbol: 'GOOGL',
-        entry: '30 @ $132.58 | 2023-09-20',
-        exit: '30 @ $139.82 | 2023-12-01',
-        pl: '+5.46% ($217.20)',
-        potential: '$360.00'
+        symbol: 'INFY',
+        entry: '40 @ ₹1,400.00 | 2023-09-20',
+        exit: '40 @ ₹1,525.00 | 2023-12-01',
+        pl: '+8.93% (₹5,000.00)',
+        potential: '₹5,600.00'
       },
       {
-        symbol: 'AMZN',
-        entry: '40 @ $127.86 | 2023-10-12',
-        exit: '40 @ $146.38 | 2023-12-15',
-        pl: '+14.48% ($740.80)',
-        potential: '$920.00'
+        symbol: 'HDFCBANK',
+        entry: '35 @ ₹1,520.00 | 2023-10-12',
+        exit: '35 @ ₹1,640.00 | 2023-12-15',
+        pl: '+7.89% (₹4,200.00)',
+        potential: '₹4,800.00'
       },
       {
-        symbol: 'TSLA',
-        entry: '20 @ $245.20 | 2023-09-08',
-        exit: '20 @ $239.45 | 2023-11-30',
-        pl: '-2.34% ($-115.00)',
-        potential: '$180.00'
+        symbol: 'ITC',
+        entry: '100 @ ₹450.00 | 2023-09-08',
+        exit: '100 @ ₹420.00 | 2023-11-30',
+        pl: '-6.67% (₹-3,000.00)',
+        potential: '₹5,000.00'
       },
       {
-        symbol: 'NFLX',
-        entry: '15 @ $398.75 | 2023-10-03',
-        exit: '15 @ $482.95 | 2023-12-18',
-        pl: '+21.12% ($1,263.00)',
-        potential: '$1,500.00'
+        symbol: 'LT',
+        entry: '25 @ ₹2,800.00 | 2023-10-03',
+        exit: '25 @ ₹3,100.00 | 2023-12-18',
+        pl: '+10.71% (₹7,500.00)',
+        potential: '₹8,000.00'
       },
       {
-        symbol: 'META',
-        entry: '25 @ $286.34 | 2023-09-25',
-        exit: '25 @ $334.92 | 2023-12-05',
-        pl: '+16.97% ($1,214.50)',
-        potential: '$1,375.00'
+        symbol: 'BAJFINANCE',
+        entry: '10 @ ₹7,000.00 | 2023-09-25',
+        exit: '10 @ ₹7,750.00 | 2023-12-05',
+        pl: '+10.71% (₹7,500.00)',
+        potential: '₹8,500.00'
       },
       {
-        symbol: 'NVDA',
-        entry: '18 @ $412.61 | 2023-10-20',
-        exit: '18 @ $485.09 | 2023-12-20',
-        pl: '+17.57% ($1,304.64)',
-        potential: '$1,620.00'
+        symbol: 'HCLTECH',
+        entry: '30 @ ₹1,180.00 | 2023-10-20',
+        exit: '30 @ ₹1,320.00 | 2023-12-20',
+        pl: '+11.86% (₹4,200.00)',
+        potential: '₹4,800.00'
       }
     ];
 
@@ -406,18 +406,11 @@ const ManageTrades = () => {
       <div className="flex items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Manage Trades</h2>
         <button
+          className="p-2 mx-4 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-colors shadow-sm"
+          aria-label="Add new trade"
           onClick={openModal}
-          className="ml-3 text-white flex items-center justify-center rounded-full w-8 h-8 transition-all duration-200 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-          style={{
-            backgroundColor: "rgb(96,98,255)",
-            width: "32px",  // Explicit width
-            height: "32px", // Same as width for perfect circle
-            borderRadius: "50%" // Ensures perfect circular shape
-          }}
-          aria-label="Add new trade book"
-          title="Create new trade book"
         >
-          <Plus size={16} /> {/* Using the Lucide Plus icon for better centering */}
+          <Plus size={18} />
         </button>
       </div>
 
@@ -691,7 +684,7 @@ const ManageTrades = () => {
           <div className="flex">
             <button
               onClick={decrementSL}
-              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-l-md border border-r-0 hover:bg-gray-300 transition-colors active:bg-gray-400"
+              className="px-1.5 py-1 bg-gray-200 text-gray-700 rounded-l-md border border-r-0  mx-0.5 hover:bg-gray-300 transition-colors active:bg-gray-400 text-xs font-medium"
             >
               -
             </button>
@@ -700,11 +693,11 @@ const ManageTrades = () => {
               value={slPercentage}
               onChange={(e) => setSlPercentage(parseFloat(e.target.value))}
               step="0.5"
-              className="border border-gray-300 py-2 px-3 w-20 text-center text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500 transition duration-200"
+              className="border border-gray-300 py-1.5 px-2 w-16 text-center text-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-500 transition duration-200"
             />
             <button
               onClick={incrementSL}
-              className="px-3 py-2 bg-gray-200 text-gray-700 rounded-r-md border border-l-0 hover:bg-gray-300 transition-colors active:bg-gray-400"
+              className="px-1.5 py-1 bg-gray-200 text-gray-700 rounded-r-md border border-l-0 mx-0.5 hover:bg-gray-300 transition-colors active:bg-gray-400 text-xs font-medium"
             >
               +
             </button>
@@ -824,15 +817,15 @@ const ManageTrades = () => {
                     }`}
                 >
                   <td className="px-4 py-3">
-                    <span className="font-medium">{trade.symbol}</span>
+                    <span className="font-medium text-gray-700">{trade.symbol}</span>
                   </td>
-                  <td className="px-4 py-3 text-center">{trade.entry}</td>
-                  <td className="px-4 py-3 text-center">{trade.exit}</td>
-                  <td className={`px-4 py-3 font-medium ${trade.pl.startsWith('+') ? 'text-green-600' : trade.pl.startsWith('-') ? 'text-red-600' : ''
+                  <td className="px-4 py-3 text-center text-gray-700">{trade.entry}</td>
+                  <td className="px-4 py-3 text-center text-gray-700">{trade.exit}</td>
+                  <td className={`px-4 py-3 font-medium  ${trade.pl.startsWith('+') ? 'text-green-600' : trade.pl.startsWith('-') ? 'text-red-600' : ''
                     }`}>
                     {trade.pl}
                   </td>
-                  <td className="px-4 py-3">{trade.potential}</td>
+                  <td className="px-4 py-3 text-gray-700">{trade.potential}</td>
                 </tr>
               ))
             ) : (
@@ -871,15 +864,14 @@ const ManageTrades = () => {
         </button>
       </div>
 
-      {/* Modal with improved animation */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md animate-slide-up">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-slide-up transition-all duration-300 ease-out">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Create New Trade Book</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Create New Trade Book</h3>
               <button
                 onClick={closeModal}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                className="text-gray-400 hover:text-gray-600 focus:outline-none"
               >
                 <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -887,34 +879,34 @@ const ManageTrades = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Enter a name for the new trade book:
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Trade Book Name
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter trade book name"
+                  placeholder="e.g., Swing Trades, Nifty Strategy"
                   value={newTradeBookName}
                   onChange={(e) => setNewTradeBookName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Enter initial total capital (portfolio value + cash)
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Initial Total Capital (Portfolio + Cash)
                 </label>
                 <input
                   type="number"
-                  placeholder="Initial Total Capital"
+                  placeholder="₹ e.g., 100000"
                   value={initialCapital}
                   onChange={(e) => setInitialCapital(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Initial Total Capital will affect portfolio level P&L. If unknown, set 0.
+                  Used for calculating portfolio-level P&L. If unknown, enter 0.
                 </p>
               </div>
 
@@ -926,23 +918,23 @@ const ManageTrades = () => {
                   onChange={(e) => setIncludeOpenPositions(e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="openPositions" className="ml-2 block text-sm text-gray-700">
-                  Open Positions
+                <label htmlFor="openPositions" className="ml-2 text-sm text-gray-700">
+                  Include Open Positions
                 </label>
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-4">
+            <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors transform hover:scale-105"
                 disabled={!newTradeBookName.trim()}
+                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition transform hover:scale-105 disabled:opacity-50"
               >
                 Save
               </button>
@@ -951,26 +943,6 @@ const ManageTrades = () => {
         </div>
       )}
 
-      {/* Add these CSS animations to your global CSS */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out;
-        }
-        
-        .animate-slide-up {
-          animation: slideUp 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 };

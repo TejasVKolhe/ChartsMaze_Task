@@ -119,6 +119,7 @@ function App() {
           <div className="p-4 md:p-6 lg:p-8 mt-16">
             <Routes>
               <Route path="/" element={<MainContent />} />
+              <Route path="/add-trades" element={<MainContent/>}/>
               <Route path="/manage-trades" element={<ManageTrades />} />
               <Route path="/open-positions" element={<OpenPositions />} />
               <Route path="/dashboard" element={<MainContent/>}/>
